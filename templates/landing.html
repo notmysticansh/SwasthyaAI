@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SwasthyaAI - Multilingual Health Awareness</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --bg: #090d16;
+      --card-bg: #111827;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    header {
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 1.1rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .logo {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-actions { display: flex; gap: 12px; }
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      padding: 0.65rem 1.4rem;
+      border-radius: 9px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+    .btn-outline { border: 1px solid var(--border); color: var(--text); background: #111827; }
+    .btn-outline:hover { background: #1f2937; border-color: #374151; }
+    .btn-primary { background: var(--primary); color: #022c22; font-weight: 700; }
+    .btn-primary:hover { background: var(--primary-hover); color: #ffffff; transform: translateY(-1px); }
+
+    .hero {
+      max-width: 900px;
+      margin: 4.5rem auto 3rem;
+      padding: 0 1.5rem;
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.4rem 0.95rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: 3.2rem;
+      line-height: 1.15;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 span { color: var(--primary); }
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 720px;
+      margin: 0 auto 2.5rem;
+    }
+    .hero-cta {
+      padding: 0.95rem 2.5rem;
+      font-size: 1.1rem;
+      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.3);
+    }
+
+    .features-section {
+      max-width: 1120px;
+      margin: 2rem auto 5rem;
+      padding: 0 1.5rem;
+    }
+    .section-title { text-align: center; margin-bottom: 3rem; }
+    .section-title h2 { font-size: 2.1rem; margin-bottom: 0.5rem; color: #f3f4f6; }
+    .section-title p { color: var(--muted); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 1.75rem;
+      transition: all 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: #374151;
+      box-shadow: 0 12px 25px -8px rgba(0,0,0,0.5);
+    }
+    .card-icon { font-size: 2.2rem; display: inline-block; margin-bottom: 1rem; }
+    .card h3 { font-size: 1.25rem; margin-bottom: 0.6rem; color: #f9fafb; }
+    .card p { color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+
+    .disclaimer {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #fca5a5;
+      max-width: 900px;
+      margin: 0 auto 4rem;
+      padding: 1.25rem 1.75rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    footer {
+      margin-top: auto;
+      text-align: center;
+      padding: 1.75rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+      border-top: 1px solid var(--border);
+      background: #0b111e;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="/" class="logo">🌿 SwasthyaAI</a>
+    <div class="nav-actions">
+      {% if current_user.is_authenticated %}
+        <a href="/dashboard" class="btn btn-primary">Open Chatbot 💬</a>
+        <a href="/logout" class="btn btn-outline">Logout</a>
+      {% else %}
+        <a href="/login-page" class="btn btn-outline">Sign In</a>
+        <a href="/login-page" class="btn btn-primary">Get Started</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <span class="badge">Next-Gen AI Health Assistant</span>
+      <h1>Understand Health in Your <span>Native Language</span></h1>
+      <p>
+        Symptom triaging, health guidance, and wellness insights in 12+ Indian native scripts with instant conversational clarity.
+      </p>
+      <a href="/login-page" class="btn btn-primary hero-cta">Start Consultation Now →</a>
+    </section>
+
+    <section class="features-section">
+      <div class="section-title">
+        <h2>Designed for Speed, Accuracy & Safety</h2>
+        <p>Your multilingual companion for day-to-day wellness decisions</p>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-icon">🗣️</div>
+          <h3>12+ Indian Languages</h3>
+          <p>Full support for Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Punjabi, Urdu, and more in their native scripts.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <h3>Ultra-Fast Responses</h3>
+          <p>Instantaneous conversational responses in real-time with zero waiting delays or buffering.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🩺</div>
+          <h3>Responsible Triaging</h3>
+          <p>Follow-up questioning designed to accurately understand your context rather than giving alarming diagnoses.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🔒</div>
+          <h3>Encrypted History</h3>
+          <p>Your conversations are saved securely in your authenticated account and can be reviewed or cleared anytime.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="disclaimer">
+      <strong>Important Medical Disclaimer:</strong> SwasthyaAI provides health education and awareness only. It does not replace professional medical advice, clinical diagnosis, prescriptions, or emergency services. If you experience severe pain or shortness of breath, contact emergency healthcare providers immediately.
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2026 SwasthyaAI. Multilingual Health Awareness Assistant.
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account Access - SwasthyaAI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --bg: #090d16;
+      --card-bg: #111827;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+      --input-bg: #0b101b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body {
+      background-color: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      color: var(--text);
+    }
+    .auth-container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 440px;
+      padding: 2.5rem;
+      border-radius: 18px;
+      box-shadow: 0 15px 35px -5px rgba(0,0,0,0.6);
+      border: 1px solid var(--border);
+    }
+    .header { text-align: center; margin-bottom: 2rem; }
+    .brand-link { text-decoration: none; font-size: 1.8rem; font-weight: 800; color: var(--primary); display: inline-block; margin-bottom: 0.5rem; }
+    .header p { color: var(--muted); font-size: 0.95rem; }
+
+    .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 1.75rem; }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s ease;
+    }
+    .tab.active { color: var(--primary); border-color: var(--primary); }
+
+    .form-group { margin-bottom: 1.15rem; }
+    .form-group label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 0.4rem; color: #d1d5db; }
+    .form-group input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: #ffffff;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+    .form-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
+
+    .submit-btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--primary);
+      color: #022c22;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    .submit-btn:hover { background: var(--primary-hover); color: #ffffff; }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 1.5rem 0;
+      color: #6b7280;
+      font-size: 0.85rem;
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border); }
+    .divider:not(:empty)::before { margin-right: .5em; }
+    .divider:not(:empty)::after { margin-left: .5em; }
+
+    .google-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 0.8rem;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #f3f4f6;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: background 0.2s ease;
+      cursor: pointer;
+    }
+    .google-btn:hover { background: #374151; border-color: #4b5563; }
+
+    .alert {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      margin-bottom: 1.25rem;
+      display: none;
+    }
+    .back-home {
+      display: block;
+      text-align: center;
+      margin-top: 1.5rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+    }
+    .back-home:hover { color: var(--primary); }
+  </style>
+</head>
+<body>
+
+  <div class="auth-container">
+    <div class="header">
+      <a href="/" class="brand-link">🌿 SwasthyaAI</a>
+      <p id="headerSub">Sign in to continue to your dashboard</p>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" id="loginTab" onclick="setMode('login')">Sign In</div>
+      <div class="tab" id="registerTab" onclick="setMode('register')">Register</div>
+    </div>
+
+    <div id="alertBox" class="alert"></div>
+
+    <form id="authForm" onsubmit="handleAuth(event)">
+      <div class="form-group" id="nameGroup" style="display: none;">
+        <label>Full Name</label>
+        <input type="text" id="nameInput" placeholder="Rahul Sharma">
+      </div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="emailInput" placeholder="name@example.com" required>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="passwordInput" placeholder="••••••••" required>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Sign In</button>
+    </form>
+
+    <div class="divider">or continue with</div>
+
+    <a href="javascript:void(0)" onclick="handleGoogleLogin()" class="google-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.97 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+      </svg>
+      Sign In with Google
+    </a>
+
+    <a href="/" class="back-home">← Back to home</a>
+  </div>
+
+  <script>
+    let mode = 'login';
+
+    function setMode(newMode) {
+      mode = newMode;
+      document.getElementById('alertBox').style.display = 'none';
+
+      if (mode === 'login') {
+        document.getElementById('loginTab').classList.add('active');
+        document.getElementById('registerTab').classList.remove('active');
+        document.getElementById('nameGroup').style.display = 'none';
+        document.getElementById('submitBtn').innerText = 'Sign In';
+        document.getElementById('headerSub').innerText = 'Sign in to continue to your dashboard';
+      } else {
+        document.getElementById('registerTab').classList.add('active');
+        document.getElementById('loginTab').classList.remove('active');
+        document.getElementById('nameGroup').style.display = 'block';
+        document.getElementById('submitBtn').innerText = 'Create Account';
+        document.getElementById('headerSub').innerText = 'Create your account to access consultations';
+      }
+    }
+
+    function handleGoogleLogin() {
+      // Always initiate Google login on localhost:5000 to match authorized Google URIs
+      window.location.href = "http://localhost:5000/login/google";
+    }
+
+    async function handleAuth(e) {
+      e.preventDefault();
+      const alertBox = document.getElementById('alertBox');
+      alertBox.style.display = 'none';
+
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const name = document.getElementById('nameInput').value.trim();
+
+      const endpoint = mode === 'login' ? '/api/login' : '/api/register';
+      const body = mode === 'login' ? { email, password } : { name, email, password };
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          alertBox.innerText = data.error || 'Authentication failed.';
+          alertBox.style.display = 'block';
+        } else {
+          window.location.href = '/dashboard';
+        }
+      } catch (err) {
+        alertBox.innerText = 'Network error. Please try again.';
+        alertBox.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

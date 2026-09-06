@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SwasthyaAI - Consultation & Care</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --bg: #090d16;
+      --card-bg: #111827;
+      --border: #1f2937;
+      --user-msg: #064e3b;
+      --user-border: #047857;
+      --bot-msg: #111827;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --input-bg: #111827;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* Custom Modern Dark Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #374151; }
+
+    /* Top Navbar */
+    header {
+      background: #111827;
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      width: 100%;
+    }
+    .brand { font-size: 1.35rem; font-weight: 800; color: var(--primary); text-decoration: none; }
+    .controls { display: flex; align-items: center; gap: 10px; }
+
+    select.lang-picker {
+      padding: 0.45rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #374151;
+      font-size: 0.9rem;
+      outline: none;
+      background: #1f2937;
+      color: #f3f4f6;
+      font-weight: 500;
+    }
+    .btn-action {
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid #374151;
+      background: #1f2937;
+      color: #e5e7eb;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-action:hover { background: #374151; }
+    .btn-hospital { background: #064e3b; border-color: #059669; color: #34d399; }
+    .btn-hospital:hover { background: #047857; color: #ffffff; }
+    .btn-danger { color: #f87171; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+
+    /* Chat Area Layout Fix */
+    .chat-wrapper {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .chat-layout {
+      width: 100%;
+      max-width: 1000px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem 1.5rem 0.75rem;
+    }
+    .messages-pane {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .message-row { display: flex; gap: 12px; max-width: 82%; }
+    .message-row.user { align-self: flex-end; flex-direction: row-reverse; }
+    .message-row.bot { align-self: flex-start; }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .user .avatar { background: #064e3b; border: 1px solid #059669; }
+    .bot .avatar { background: #1f2937; border: 1px solid #374151; }
+
+    .bubble {
+      padding: 0.85rem 1.15rem;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .user .bubble {
+      background: var(--user-msg);
+      color: #f0fdf4;
+      border: 1px solid var(--user-border);
+      border-bottom-right-radius: 2px;
+    }
+    .bot .bubble {
+      background: var(--bot-msg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 2px;
+    }
+
+    /* Input Bar */
+    .input-pane {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      margin-top: 0.5rem;
+    }
+    .input-pane textarea {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      resize: none;
+      font-size: 0.95rem;
+      color: #ffffff;
+      height: 24px;
+      max-height: 120px;
+      line-height: 24px;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .icon-btn:hover { background: #1f2937; color: #ffffff; }
+
+    .mic-btn.listening {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #ef4444;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .send-btn {
+      background: var(--primary);
+      color: #022c22;
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .send-btn:hover { background: var(--primary-hover); color: #ffffff; }
+    .send-btn:disabled { background: #374151; cursor: not-allowed; color: #6b7280; }
+
+    .typing-indicator { font-size: 0.85rem; color: var(--primary); font-style: italic; display: none; margin-bottom: 0.25rem; }
+
+    /* Hospitals Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+    .modal-box {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 18px;
+      width: 100%;
+      max-width: 680px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    }
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #1f2937;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 { font-size: 1.2rem; color: #f9fafb; display: flex; align-items: center; gap: 8px; }
+    .close-btn { background: none; border: none; font-size: 1.5rem; color: var(--muted); cursor: pointer; }
+    .close-btn:hover { color: #ffffff; }
+
+    .modal-body {
+      padding: 1.25rem 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .loc-inputs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+    .loc-input {
+      flex: 1;
+      padding: 0.65rem 1rem;
+      background: #0b101b;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .loc-input:focus { border-color: var(--primary); }
+    .loc-btn {
+      padding: 0.65rem 1rem;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #022c22;
+      font-weight: 700;
+      font-size: 0.88rem;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .loc-btn:hover { background: var(--primary-hover); color: #ffffff; }
+    .gps-btn {
+      background: #1f2937;
+      color: #e5e7eb;
+      border: 1px solid #374151;
+    }
+    .gps-btn:hover { background: #374151; }
+
+    .hospitals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .hospital-card {
+      background: #0b101b;
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .hospital-info h4 { font-size: 0.98rem; margin-bottom: 0.25rem; color: #f3f4f6; }
+    .hospital-info p { font-size: 0.82rem; color: var(--muted); }
+    .hospital-meta { display: flex; gap: 10px; align-items: center; margin-top: 0.35rem; }
+    .tag-dist { background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+    .map-link {
+      padding: 0.45rem 0.85rem;
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #38bdf8;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .map-link:hover { background: #38bdf8; color: #022c22; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="/" class="brand">🌿 SwasthyaAI</a>
+    <div class="controls">
+      <button onclick="openHospitalsModal()" class="btn-action btn-hospital">🏥 Nearby Hospitals</button>
+
+      <select id="langSelect" class="lang-picker" onchange="updateSpeechLang()">
+        <option value="English" selected>English</option>
+        <option value="Hindi">हिन्दी (Hindi)</option>
+        <option value="Bengali">বাংলা (Bengali)</option>
+        <option value="Tamil">தமிழ் (Tamil)</option>
+        <option value="Telugu">తెలుగు (Telugu)</option>
+        <option value="Marathi">मराठी (Marathi)</option>
+        <option value="Gujarati">ગુજરાતી (Gujarati)</option>
+        <option value="Kannada">ಕನ್ನಡ (Kannada)</option>
+        <option value="Malayalam">മലയാളം (Malayalam)</option>
+        <option value="Punjabi">ਪੰਜਾਬੀ (Punjabi)</option>
+        <option value="Urdu">اردو (Urdu)</option>
+      </select>
+
+      <button onclick="clearChatHistory()" class="btn-action btn-danger">Clear</button>
+      <a href="/logout" class="btn-action">Log Out</a>
+    </div>
+  </header>
+
+  <div class="chat-wrapper">
+    <div class="chat-layout">
+      <div class="messages-pane" id="messagesBox">
+        <div class="message-row bot">
+          <div class="avatar">🌿</div>
+          <div class="bubble">Hello! I am SwasthyaAI. How can I help you today? You can type your health question or tap the microphone icon to speak.</div>
+        </div>
+      </div>
+
+      <div class="typing-indicator" id="typingIndicator">SwasthyaAI is thinking...</div>
+
+      <div class="input-pane">
+        <!-- Voice Input Button (Speech-to-Text) -->
+        <button type="button" class="icon-btn mic-btn" id="micBtn" onclick="toggleVoiceInput()" title="Speak to input">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="22"></line>
+            <line x1="8" y1="22" x2="16" y2="22"></line>
+          </svg>
+        </button>
+
+        <textarea id="messageInput" placeholder="Describe symptoms or tap mic to speak..." rows="1" onkeydown="handleKey(event)"></textarea>
+
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nearby Hospitals Modal -->
+  <div class="modal-overlay" id="hospitalsModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>🏥 Nearest 10 Hospitals & Clinics</h3>
+        <button class="close-btn" onclick="closeHospitalsModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="loc-inputs">
+          <input type="text" id="cityInput" class="loc-input" placeholder="Enter city/locality (e.g. Patna, Delhi, Ranchi)..." onkeydown="if(event.key==='Enter') searchHospitalsByCity()">
+          <button onclick="searchHospitalsByCity()" class="loc-btn">Search</button>
+          <button onclick="detectGPSAndSearch()" class="loc-btn gps-btn" title="Use current GPS">📍 Auto GPS</button>
+        </div>
+
+        <div id="hospitalsStatus" style="font-size: 0.9rem; color: var(--muted); margin-bottom: 0.75rem;"></div>
+
+        <div class="hospitals-list" id="hospitalsList">
+          <div style="text-align:center; padding: 2rem 0; color: var(--muted);">Click "Auto GPS" or enter your area name to find top 10 hospitals.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const messagesBox = document.getElementById('messagesBox');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const langSelect = document.getElementById('langSelect');
+    const micBtn = document.getElementById('micBtn');
+
+    // ------------------------------------------------------------------------
+    // Voice Input Feature (Web Speech API)
+    // ------------------------------------------------------------------------
+    let recognition = null;
+    let isRecording = false;
+
+    const speechLangMap = {
+      "English": "en-IN",
+      "Hindi": "hi-IN",
+      "Bengali": "bn-IN",
+      "Tamil": "ta-IN",
+      "Telugu": "te-IN",
+      "Marathi": "mr-IN",
+      "Gujarati": "gu-IN",
+      "Kannada": "kn-IN",
+      "Malayalam": "ml-IN",
+      "Punjabi": "pa-IN",
+      "Urdu": "ur-IN"
+    };
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-IN';
+
+      recognition.onstart = () => {
+        isRecording = true;
+        micBtn.classList.add('listening');
+        messageInput.placeholder = "Listening... Speak now...";
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript;
+        }
+        messageInput.value = transcript;
+      };
+
+      recognition.onerror = (event) => {
+        console.warn("Speech recognition error:", event.error);
+        stopVoiceInput();
+      };
+
+      recognition.onend = () => {
+        stopVoiceInput();
+      };
+    } else {
+      micBtn.style.display = 'none';
+    }
+
+    function updateSpeechLang() {
+      if (recognition) {
+        recognition.lang = speechLangMap[langSelect.value] || 'en-IN';
+      }
+    }
+
+    function toggleVoiceInput() {
+      if (!recognition) {
+        alert("Speech Recognition is not supported in this browser. Please use Chrome, Edge, or a Web Speech-compatible browser.");
+        return;
+      }
+      if (isRecording) {
+        recognition.stop();
+      } else {
+        updateSpeechLang();
+        recognition.start();
+      }
+    }
+
+    function stopVoiceInput() {
+      isRecording = false;
+      micBtn.classList.remove('listening');
+      messageInput.placeholder = "Describe symptoms or tap mic to speak...";
+    }
+
+    // ------------------------------------------------------------------------
+    // Chat Logic
+    // ------------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', loadHistory);
+
+    async function loadHistory() {
+      try {
+        const res = await fetch('/api/history');
+        if (res.ok) {
+          const messages = await res.json();
+          if (messages.length > 0) {
+            messagesBox.innerHTML = '';
+            messages.forEach(m => appendMessage(m.content, m.role === 'user' ? 'user' : 'bot'));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load history:", err);
+      }
+    }
+
+    function appendMessage(text, sender) {
+      const row = document.createElement('div');
+      row.className = `message-row ${sender}`;
+
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.innerText = sender === 'user' ? '👤' : '🌿';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.innerText = text;
+
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      messagesBox.appendChild(row);
+      messagesBox.scrollTop = messagesBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const text = messageInput.value.trim();
+      if (!text) return;
+
+      appendMessage(text, 'user');
+      messageInput.value = '';
+      sendBtn.disabled = true;
+      typingIndicator.style.display = 'block';
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            language: langSelect.value
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.answer) {
+          appendMessage(data.answer, 'bot');
+        } else {
+          appendMessage(data.error || "Sorry, an error occurred while processing your query.", 'bot');
+        }
+      } catch (e) {
+        appendMessage("Network error. Please try again later.", 'bot');
+      } finally {
+        sendBtn.disabled = false;
+        typingIndicator.style.display = 'none';
+      }
+    }
+
+    function handleKey(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    }
+
+    async function clearChatHistory() {
+      if (!confirm("Are you sure you want to clear your chat history?")) return;
+      try {
+        const res = await fetch('/api/history/clear', { method: 'POST' });
+        if (res.ok) {
+          messagesBox.innerHTML = '';
+          appendMessage("Chat history cleared. How can I help you today?", 'bot');
+        }
+      } catch (e) {
+        alert("Failed to clear history.");
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // Hospitals Modal & Search
+    // ------------------------------------------------------------------------
+    const hospitalsModal = document.getElementById('hospitalsModal');
+    const hospitalsList = document.getElementById('hospitalsList');
+    const hospitalsStatus = document.getElementById('hospitalsStatus');
+
+    function openHospitalsModal() {
+      hospitalsModal.style.display = 'flex';
+    }
+
+    function closeHospitalsModal() {
+      hospitalsModal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      if (event.target === hospitalsModal) {
+        closeHospitalsModal();
+      }
+    };
+
+    function detectGPSAndSearch() {
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser.");
+        return;
+      }
+      hospitalsStatus.innerText = "Detecting your location...";
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          fetchHospitals({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+        },
+        (err) => {
+          hospitalsStatus.innerText = "GPS access denied. Please type your city/area name manually.";
+        }
+      );
+    }
+
+    function searchHospitalsByCity() {
+      const city = document.getElementById('cityInput').value.trim();
+      if (!city) {
+        alert("Please enter a city or area name.");
+        return;
+      }
+      fetchHospitals({ query: city });
+    }
+
+    async function fetchHospitals(payload) {
+      hospitalsStatus.innerText = "Finding nearest 10 hospitals & medical centers...";
+      hospitalsList.innerHTML = '<div style="text-align:center; padding: 2rem 0; color: var(--muted);">Searching live healthcare facilities...</div>';
+
+      try {
+        const res = await fetch('/api/hospitals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (res.ok && data.hospitals && data.hospitals.length > 0) {
+          hospitalsStatus.innerText = `Top ${data.hospitals.length} nearest medical facilities:`;
+          hospitalsList.innerHTML = '';
+
+          data.hospitals.forEach(h => {
+            const card = document.createElement('div');
+            card.className = 'hospital-card';
+            card.innerHTML = `
+              <div class="hospital-info">
+                <h4>${h.name}</h4>
+                <p>${h.address}</p>
+                <div class="hospital-meta">
+                  <span class="tag-dist">${h.distance_km}</span>
+                  <span style="font-size:0.75rem; color:var(--muted)">🏥 ${h.type}</span>
+                </div>
+              </div>
+              <a href="${h.maps_url}" target="_blank" class="map-link">
+                Directions ↗
+              </a>
+            `;
+            hospitalsList.appendChild(card);
+          });
+        } else {
+          showMapsDirectButton(payload);
+        }
+      } catch (err) {
+        showMapsDirectButton(payload);
+      }
+    }
+
+    function showMapsDirectButton(payload) {
+      const q = payload.query || "nearby hospitals";
+      hospitalsStatus.innerText = "Showing direct map results:";
+      hospitalsList.innerHTML = `
+        <div style="text-align:center; padding: 1.5rem; background: #0b101b; border-radius: 10px; border: 1px solid var(--border);">
+          <p style="color: #f3f4f6; margin-bottom: 1rem;">View all verified hospitals and clinics for <b>"${q}"</b> directly on Google Maps:</p>
+          <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('hospitals near ' + q)}" target="_blank" class="map-link" style="display:inline-block; padding: 0.65rem 1.5rem; font-size: 0.95rem;">
+            Open Google Maps Results ↗
+          </a>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
