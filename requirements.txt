@@ -6,3 +6,4 @@ Flask-Dance
 python-dotenv
 groq
 Werkzeug
+gunicorn
