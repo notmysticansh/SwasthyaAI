@@ -3,219 +3,515 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SwasthyaAI - Multilingual Health Awareness</title>
+  <title>SwasthyaAI - Multilingual Health Awareness Assistant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <!-- Google Model-Viewer for 3D PBR Anatomy Display -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
   <style>
     :root {
+      --bg: #090e17;
+      --card-bg: rgba(17, 26, 44, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
       --primary: #10b981;
-      --primary-hover: #059669;
-      --bg: #090d16;
-      --card-bg: #111827;
+      --primary-gradient: linear-gradient(135deg, #10b981, #34d399);
       --text: #f9fafb;
-      --muted: #9ca3af;
-      --border: #1f2937;
+      --muted: #94a3b8;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
-    
-    header {
-      background: rgba(17, 24, 39, 0.7);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 1.1rem 2.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-    .logo {
-      font-size: 1.45rem;
-      font-weight: 800;
-      color: var(--primary);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .nav-actions { display: flex; gap: 12px; }
-    .btn {
-      display: inline-block;
-      text-decoration: none;
-      padding: 0.65rem 1.4rem;
-      border-radius: 9px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: all 0.2s ease;
-    }
-    .btn-outline { border: 1px solid var(--border); color: var(--text); background: #111827; }
-    .btn-outline:hover { background: #1f2937; border-color: #374151; }
-    .btn-primary { background: var(--primary); color: #022c22; font-weight: 700; }
-    .btn-primary:hover { background: var(--primary-hover); color: #ffffff; transform: translateY(-1px); }
 
-    .hero {
-      max-width: 900px;
-      margin: 4.5rem auto 3rem;
-      padding: 0 1.5rem;
-      text-align: center;
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
     }
+
+    /* Top Navigation */
+    header {
+      padding: 1.25rem 3.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #10b981;
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+    .nav-btns {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-nav-outline {
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #e2e8f0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-nav-outline:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .btn-nav-fill {
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      background: var(--primary-gradient);
+      color: #022c22;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-nav-fill:hover {
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+      transform: translateY(-1px);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 3rem 2rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Hero Section Side-by-Side */
+    .hero-wrapper {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 2.5rem;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 4rem;
+    }
+    @media (max-width: 1024px) {
+      .hero-wrapper { grid-template-columns: 1fr; text-align: center; }
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+    @media (max-width: 1024px) {
+      .hero-content { align-items: center; text-align: center; }
+    }
+
     .badge {
       display: inline-block;
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: var(--primary);
+      padding: 0.35rem 0.9rem;
+      border-radius: 20px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #10b981;
+      font-size: 0.72rem;
       font-weight: 700;
-      font-size: 0.8rem;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
-      padding: 0.4rem 0.95rem;
-      border-radius: 999px;
-      margin-bottom: 1.5rem;
-    }
-    .hero h1 {
-      font-size: 3.2rem;
-      line-height: 1.15;
-      font-weight: 800;
-      color: #ffffff;
       margin-bottom: 1.25rem;
     }
-    .hero h1 span { color: var(--primary); }
-    .hero p {
-      font-size: 1.2rem;
+
+    h1 {
+      font-size: 3.4rem;
+      font-weight: 800;
+      line-height: 1.18;
+      letter-spacing: -1px;
+      margin-bottom: 1.25rem;
+    }
+    h1 span {
+      color: #10b981;
+    }
+
+    p.subtitle {
       color: var(--muted);
-      line-height: 1.6;
-      max-width: 720px;
-      margin: 0 auto 2.5rem;
-    }
-    .hero-cta {
-      padding: 0.95rem 2.5rem;
-      font-size: 1.1rem;
-      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.3);
+      font-size: 1.05rem;
+      line-height: 1.65;
+      max-width: 600px;
+      margin-bottom: 2rem;
     }
 
-    .features-section {
-      max-width: 1120px;
-      margin: 2rem auto 5rem;
-      padding: 0 1.5rem;
+    .cta-btn {
+      padding: 0.85rem 1.85rem;
+      border-radius: 10px;
+      background: var(--primary-gradient);
+      color: #022c22;
+      font-size: 0.98rem;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
-    .section-title { text-align: center; margin-bottom: 3rem; }
-    .section-title h2 { font-size: 2.1rem; margin-bottom: 0.5rem; color: #f3f4f6; }
-    .section-title p { color: var(--muted); }
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+    }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
+    /* 3D Model Card Viewport */
+    .model-viewport-box {
+      background: radial-gradient(circle at center, rgba(17, 26, 44, 0.8) 0%, rgba(9, 14, 23, 0.95) 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 1.25rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      width: 100%;
     }
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
+
+    .model-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+    .model-tab-btn {
+      flex: 1;
+      padding: 0.55rem 0.75rem;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: #cbd5e1;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .model-tab-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+    .model-tab-btn.active {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: var(--primary);
+      color: #34d399;
+    }
+
+    .canvas-container {
+      width: 100%;
+      height: 380px;
       border-radius: 16px;
-      padding: 2rem 1.75rem;
-      transition: all 0.2s ease;
-    }
-    .card:hover {
-      transform: translateY(-4px);
-      border-color: #374151;
-      box-shadow: 0 12px 25px -8px rgba(0,0,0,0.5);
-    }
-    .card-icon { font-size: 2.2rem; display: inline-block; margin-bottom: 1rem; }
-    .card h3 { font-size: 1.25rem; margin-bottom: 0.6rem; color: #f9fafb; }
-    .card p { color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
-
-    .disclaimer {
-      background: rgba(239, 68, 68, 0.08);
-      border: 1px solid rgba(239, 68, 68, 0.25);
-      color: #fca5a5;
-      max-width: 900px;
-      margin: 0 auto 4rem;
-      padding: 1.25rem 1.75rem;
-      border-radius: 12px;
-      font-size: 0.9rem;
-      line-height: 1.6;
-      text-align: center;
+      background: radial-gradient(circle at center, #0f172a 0%, #090e17 100%);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      position: relative;
+      overflow: hidden;
     }
 
-    footer {
-      margin-top: auto;
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      --poster-color: transparent;
+      outline: none;
+    }
+
+    .viewport-overlay {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(9, 14, 23, 0.85);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      pointer-events: none;
+      backdrop-filter: blur(6px);
+      z-index: 5;
+    }
+    .viewport-title { color: var(--primary); font-weight: 700; }
+    .viewport-sub { color: var(--muted); font-size: 0.68rem; margin-top: 1px; }
+
+    .control-hint {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(9, 14, 23, 0.85);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      color: #38bdf8;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Section: Designed for Speed, Accuracy & Safety */
+    .section-title {
       text-align: center;
-      padding: 1.75rem;
+      margin-bottom: 2.5rem;
+    }
+    .section-title h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.5px;
+    }
+    .section-title p {
       color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* 4 Feature Cards */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      width: 100%;
+      margin-bottom: 3.5rem;
+    }
+    @media (max-width: 960px) {
+      .feature-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .feature-grid { grid-template-columns: 1fr; }
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 1.85rem 1.5rem;
+      text-align: left;
+      backdrop-filter: blur(12px);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+    .feature-icon {
+      font-size: 1.75rem;
+      margin-bottom: 1.15rem;
+      display: inline-block;
+    }
+    .feature-card h3 {
+      font-size: 1.12rem;
+      font-weight: 700;
+      margin-bottom: 0.65rem;
+      color: #ffffff;
+    }
+    .feature-card p {
       font-size: 0.88rem;
-      border-top: 1px solid var(--border);
-      background: #0b111e;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* Disclaimer Box */
+    .disclaimer-box {
+      background: rgba(239, 68, 68, 0.05);
+      border: 1px solid rgba(239, 68, 68, 0.18);
+      border-radius: 12px;
+      padding: 1.1rem 1.6rem;
+      max-width: 900px;
+      text-align: center;
+      font-size: 0.82rem;
+      color: #fca5a5;
+      line-height: 1.6;
+      margin-bottom: 3.5rem;
+    }
+    .disclaimer-box b {
+      color: #f87171;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: #64748b;
+      font-size: 0.82rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
     }
   </style>
 </head>
 <body>
 
   <header>
-    <a href="/" class="logo">🌿 SwasthyaAI</a>
-    <div class="nav-actions">
+    <a href="/" class="brand">🌿 SwasthyaAI</a>
+    <div class="nav-btns">
       {% if current_user.is_authenticated %}
-        <a href="/dashboard" class="btn btn-primary">Open Chatbot 💬</a>
-        <a href="/logout" class="btn btn-outline">Logout</a>
+        <a href="/dashboard" class="btn-nav-fill">Open Chatbot 💬</a>
+        <a href="/logout" class="btn-nav-outline">Logout</a>
       {% else %}
-        <a href="/login-page" class="btn btn-outline">Sign In</a>
-        <a href="/login-page" class="btn btn-primary">Get Started</a>
+        <a href="/auth" class="btn-nav-outline">Sign In</a>
+        <a href="/auth" class="btn-nav-fill">Get Started</a>
       {% endif %}
     </div>
   </header>
 
   <main>
-    <section class="hero">
-      <span class="badge">Next-Gen AI Health Assistant</span>
-      <h1>Understand Health in Your <span>Native Language</span></h1>
-      <p>
-        Symptom triaging, health guidance, and wellness insights in 12+ Indian native scripts with instant conversational clarity.
-      </p>
-      <a href="/login-page" class="btn btn-primary hero-cta">Start Consultation Now →</a>
-    </section>
-
-    <section class="features-section">
-      <div class="section-title">
-        <h2>Designed for Speed, Accuracy & Safety</h2>
-        <p>Your multilingual companion for day-to-day wellness decisions</p>
+    <!-- Hero Section -->
+    <div class="hero-wrapper">
+      <div class="hero-content">
+        <span class="badge">NEXT-GEN AI HEALTH ASSISTANT</span>
+        <h1>Understand Health in Your <span>Native Language</span></h1>
+        <p class="subtitle">
+          Symptom triaging, health guidance, and wellness insights in 12+ Indian native scripts with instant conversational clarity.
+        </p>
+        <a href="/dashboard" class="cta-btn">Start Consultation Now →</a>
       </div>
 
-      <div class="grid">
-        <div class="card">
-          <div class="card-icon">🗣️</div>
-          <h3>12+ Indian Languages</h3>
-          <p>Full support for Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Punjabi, Urdu, and more in their native scripts.</p>
+      <!-- 3D Anatomical Organ Workstation -->
+      <div class="model-viewport-box">
+        <div class="model-tabs">
+          <button class="model-tab-btn active" onclick="loadOrgan('heart')">🫀 Cardio Heart</button>
+          <button class="model-tab-btn" onclick="loadOrgan('lungs')">🫁 Pulmonary Lungs</button>
+          <button class="model-tab-btn" onclick="loadOrgan('brain')">🧠 Cerebral Brain</button>
         </div>
 
-        <div class="card">
-          <div class="card-icon">⚡</div>
-          <h3>Ultra-Fast Responses</h3>
-          <p>Instantaneous conversational responses in real-time with zero waiting delays or buffering.</p>
-        </div>
+        <div class="canvas-container">
+          <!-- Continuous 360° rotation with locked position (disable-pan) -->
+          <model-viewer
+            id="organViewer"
+            src="/static/models/realistic_human_heart.glb"
+            alt="3D Organ"
+            auto-rotate
+            auto-rotate-delay="0"
+            rotation-per-second="25deg"
+            camera-controls
+            disable-pan
+            touch-action="pan-y"
+            shadow-intensity="1.5"
+            shadow-softness="0.8"
+            exposure="1.15"
+            interaction-prompt="none">
+          </model-viewer>
 
-        <div class="card">
-          <div class="card-icon">🩺</div>
-          <h3>Responsible Triaging</h3>
-          <p>Follow-up questioning designed to accurately understand your context rather than giving alarming diagnoses.</p>
-        </div>
+          <div class="viewport-overlay">
+            <div class="viewport-title" id="hudName">CARDIOVASCULAR MYOCARDIUM</div>
+            <div class="viewport-sub" id="hudStatus">CORONARY VASCULAR PERFUSION ACTIVE</div>
+          </div>
 
-        <div class="card">
-          <div class="card-icon">🔒</div>
-          <h3>Encrypted History</h3>
-          <p>Your conversations are saved securely in your authenticated account and can be reviewed or cleared anytime.</p>
+          <div class="control-hint">
+            <span>🔄 360° Non-Stop Spin | 🖱️ Orbit & Zoom Only</span>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <div class="disclaimer">
-      <strong>Important Medical Disclaimer:</strong> SwasthyaAI provides health education and awareness only. It does not replace professional medical advice, clinical diagnosis, prescriptions, or emergency services. If you experience severe pain or shortness of breath, contact emergency healthcare providers immediately.
+    <!-- Section: Designed for Speed, Accuracy & Safety -->
+    <div class="section-title">
+      <h2>Designed for Speed, Accuracy & Safety</h2>
+      <p>Your multilingual companion for day-to-day wellness decisions</p>
+    </div>
+
+    <!-- 4 Exact Cards from the Image -->
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🗣️</span>
+        <h3>12+ Indian Languages</h3>
+        <p>Full support for Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Punjabi, Urdu, and more in their native scripts.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <h3>Ultra-Fast Responses</h3>
+        <p>Instantaneous conversational responses in real-time with zero waiting delays or buffering.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🩺</span>
+        <h3>Responsible Triaging</h3>
+        <p>Follow-up questioning designed to accurately understand your context rather than giving alarming diagnoses.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <h3>Encrypted History</h3>
+        <p>Your conversations are saved securely in your authenticated account and can be reviewed or cleared anytime.</p>
+      </div>
+    </div>
+
+    <!-- Medical Disclaimer -->
+    <div class="disclaimer-box">
+      <b>Important Medical Disclaimer:</b> SwasthyaAI provides health education and awareness only. It does not replace professional medical advice, clinical diagnosis, prescriptions, or emergency services. If you experience severe pain or shortness of breath, contact emergency healthcare providers immediately.
     </div>
   </main>
 
   <footer>
-    &copy; 2026 SwasthyaAI. Multilingual Health Awareness Assistant.
+    © 2026 SwasthyaAI. Multilingual Health Awareness Assistant.
   </footer>
 
+  <script>
+    // Exact requested static paths & metrics
+    const organModels = {
+      heart: {
+        url: "/static/models/realistic_human_heart.glb",
+        name: "CARDIOVASCULAR MYOCARDIUM",
+        status: "CORONARY VASCULAR PERFUSION ACTIVE",
+        bpm: "72 BPM",
+        spo2: "98.5%",
+        bp: "120/80"
+      },
+      lungs: {
+        url: "/static/models/realistic_human_lungs.glb",
+        name: "PULMONARY RESPIRATORY LUNGS",
+        status: "ALVEOLAR GAS EXCHANGE: TIDAL 500mL",
+        bpm: "16 RPM",
+        spo2: "99.2%",
+        bp: "14 cmH₂O"
+      },
+      brain: {
+        url: "/static/models/realistic_human_brain.glb",
+        name: "CENTRAL NERVOUS CEREBRAL CORTEX",
+        status: "SYNAPTIC ACTIVITY: 14 Hz (BETA)",
+        bpm: "14 Hz",
+        spo2: "100%",
+        bp: "ICP 10 mmHg"
+      }
+    };
+
+    const viewer = document.getElementById('organViewer');
+    const hudName = document.getElementById('hudName');
+    const hudStatus = document.getElementById('hudStatus');
+
+    // Default Load: Realistic Heart
+    viewer.src = organModels.heart.url;
+
+    function loadOrgan(type) {
+      document.querySelectorAll('.model-tab-btn').forEach(b => b.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+
+      const data = organModels[type];
+      viewer.src = data.url;
+      hudName.innerText = data.name;
+      hudStatus.innerText = data.status;
+
+      // Tab switch hone par constant spin ensure karna
+      viewer.autoRotate = true;
+    }
+
+    // Interaction ke baad turant 360 rotation wapas resume karna
+    let timer = null;
+    viewer.addEventListener('camera-change', (event) => {
+      if (event.detail && event.detail.source === 'user-interaction') {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          viewer.autoRotate = true;
+        }, 400);
+      }
+    });
+  </script>
 </body>
 </html>
