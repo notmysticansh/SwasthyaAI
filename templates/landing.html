@@ -273,7 +273,7 @@
       font-size: 0.95rem;
     }
 
-    /* 4 Feature Cards */
+    /* 4 Feature Cards (Original Content) */
     .feature-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -354,8 +354,9 @@
         <a href="/dashboard" class="btn-nav-fill">Open Chatbot 💬</a>
         <a href="/logout" class="btn-nav-outline">Logout</a>
       {% else %}
-        <a href="/auth" class="btn-nav-outline">Sign In</a>
-        <a href="/auth" class="btn-nav-fill">Get Started</a>
+        <!-- Redirects safely to login without 404 via @login_required -->
+        <a href="/dashboard" class="btn-nav-outline">Sign In</a>
+        <a href="/dashboard" class="btn-nav-fill">Get Started</a>
       {% endif %}
     </div>
   </header>
@@ -454,23 +455,16 @@
   </footer>
 
   <script>
-    // Exact requested static paths & metrics
     const organModels = {
       heart: {
         url: "/static/models/realistic_human_heart.glb",
         name: "CARDIOVASCULAR MYOCARDIUM",
-        status: "CORONARY VASCULAR PERFUSION ACTIVE",
-        bpm: "72 BPM",
-        spo2: "98.5%",
-        bp: "120/80"
+        status: "CORONARY VASCULAR PERFUSION ACTIVE"
       },
       lungs: {
         url: "/static/models/realistic_human_lungs.glb",
         name: "PULMONARY RESPIRATORY LUNGS",
-        status: "ALVEOLAR GAS EXCHANGE: TIDAL 500mL",
-        bpm: "16 RPM",
-        spo2: "99.2%",
-        bp: "14 cmH₂O"
+        status: "ALVEOLAR GAS EXCHANGE: TIDAL 500mL"
       },
       brain: {
         url: "/static/models/realistic_human_brain.glb",
@@ -498,11 +492,11 @@
       hudName.innerText = data.name;
       hudStatus.innerText = data.status;
 
-      // Tab switch hone par constant spin ensure karna
+      // Ensure continuous 360 spin on switch
       viewer.autoRotate = true;
     }
 
-    // Interaction ke baad turant 360 rotation wapas resume karna
+    // Immediately resume rotation after interaction
     let timer = null;
     viewer.addEventListener('camera-change', (event) => {
       if (event.detail && event.detail.source === 'user-interaction') {
